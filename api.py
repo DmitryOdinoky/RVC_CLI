@@ -41,7 +41,10 @@ def download_extract_dataset(gdrive_id, target_dir):
 
     # Extract all .wav files from the downloaded zip
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        # Get the base filename of the zip file (without extension)
         zip_filename_without_extension = os.path.splitext(os.path.basename(zip_path))[0]
+
+        # Extract path should be a subfolder named after the zip file
         extract_path = os.path.join(target_dir, zip_filename_without_extension)
         
         # Ensure the target directory is empty before extraction
@@ -54,7 +57,7 @@ def download_extract_dataset(gdrive_id, target_dir):
         else:
             os.makedirs(extract_path, exist_ok=True)
         
-        # Extract all .wav files from the zip
+        # Extract all .wav files from the zip to the subfolder
         for file in zip_ref.namelist():
             if file.endswith('.wav'):
                 zip_ref.extract(file, extract_path)
