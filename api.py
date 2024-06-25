@@ -1,6 +1,4 @@
 from fastapi import FastAPI, Request, HTTPException
-import requests
-import re
 import subprocess
 import time
 import os
@@ -21,7 +19,7 @@ def execute_command(command):
 # Helper function to download and extract files from Google Drive using gdown
 def download_and_extract_gdrive(gdrive_id, target_dir):
     url = f"https://drive.google.com/uc?id={gdrive_id}"
-    zip_path = os.path.join(target_dir, "temp.zip")
+    zip_path = target_dir
     
     gdown.download(url, output=zip_path, quiet=False)
 
@@ -34,36 +32,16 @@ def download_and_extract_gdrive(gdrive_id, target_dir):
     # Remove the downloaded zip file after extraction
     os.remove(zip_path)
 
-# Helper function to get the original filename from Google Drive
-def get_original_filename(gdrive_id):
-    url = f"https://drive.google.com/uc?id={gdrive_id}"
-    headers = {"Content-Type": "application/json"}
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        content_disposition = response.headers.get("content-disposition")
-        if content_disposition:
-            filename = re.findall("filename=(.+)", content_disposition)
-            if filename:
-                return filename[0].strip('"')
-    return None
-
 # Combined function to download and extract .wav files from Google Drive using gdown
 def download_extract_dataset(gdrive_id, target_dir):
-    original_filename = get_original_filename(gdrive_id)
-    if not original_filename:
-        raise ValueError("Failed to retrieve original filename from Google Drive.")
-
     url = f"https://drive.google.com/uc?id={gdrive_id}"
-    zip_path = os.path.join(target_dir, original_filename)
+    zip_path = os.path.join(target_dir, "temp.zip")
     
     gdown.download(url, output=zip_path, quiet=False)
 
     # Extract all .wav files from the downloaded zip
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        # Get the base filename of the zip file (without extension)
-        zip_filename_without_extension = os.path.splitext(original_filename)[0]
-
-        # Extract path should be a subfolder named after the zip file
+        zip_filename_without_extension = os.path.splitext(os.path.basename(zip_path))[0]
         extract_path = os.path.join(target_dir, zip_filename_without_extension)
         
         # Ensure the target directory is empty before extraction
@@ -76,7 +54,7 @@ def download_extract_dataset(gdrive_id, target_dir):
         else:
             os.makedirs(extract_path, exist_ok=True)
         
-        # Extract all .wav files from the zip to the subfolder
+        # Extract all .wav files from the zip
         for file in zip_ref.namelist():
             if file.endswith('.wav'):
                 zip_ref.extract(file, extract_path)
@@ -99,8 +77,7 @@ async def remove_dataset():
         raise HTTPException(status_code=404, detail="Dataset directory not found")
 
 # Endpoint to handle removing a specific subfolder within the dataset directory
-@app.delete("/remove_dataset_subfolder")
-async def remove_dataset_subfolder(subfolder_name: str):
+async def remove_subfolder(subfolder_name: str):
     target_dir = "/app/data/dataset"
     subfolder_path = os.path.join(target_dir, subfolder_name)
 
