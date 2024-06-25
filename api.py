@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 import subprocess
 import time
 import os
@@ -20,13 +20,15 @@ def download_and_extract_gdrive(gdrive_id, target_dir):
     url = f"https://drive.google.com/uc?id={gdrive_id}"
     zip_path = os.path.join(target_dir, "temp.zip")
     
-    gdown.download(url, zip_path, quiet=False)
-    
+    gdown.download(url, output=zip_path, quiet=False)
+
+    # Extract .pth files from the downloaded zip
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         for file in zip_ref.namelist():
             if file.endswith('.pth'):
                 zip_ref.extract(file, target_dir)
     
+    # Remove the downloaded zip file after extraction
     os.remove(zip_path)
 
 # Endpoint to handle Google Drive downloads
@@ -36,7 +38,7 @@ async def download_gdrive(request: Request):
     gdrive_id = data.get("id")
 
     if not gdrive_id:
-        return {"error": "Google Drive ID not provided"}
+        raise HTTPException(status_code=400, detail="Google Drive ID not provided")
 
     target_dir = "/app/data/RVC_CLI/logs/weights"
 
@@ -47,7 +49,7 @@ async def download_gdrive(request: Request):
         download_and_extract_gdrive(gdrive_id, target_dir)
         return {"status": "success", "message": "Files downloaded and extracted successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Other endpoints...
 @app.post("/infer")
