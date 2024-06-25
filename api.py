@@ -42,22 +42,22 @@ def download_extract_dataset(gdrive_id, target_dir):
     # Extract all .wav files from the downloaded zip
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_filename_without_extension = os.path.splitext(os.path.basename(zip_path))[0]
-        extract_path = os.path.join(target_dir, zip_filename_without_extension)
+       
         
         # Ensure the target directory is empty before extraction
-        if os.path.exists(extract_path):
-            for root, dirs, files in os.walk(extract_path):
+        if os.path.exists(target_dir):
+            for root, dirs, files in os.walk(target_dir):
                 for file in files:
                     os.remove(os.path.join(root, file))
                 for dir in dirs:
                     os.rmdir(os.path.join(root, dir))
         else:
-            os.makedirs(extract_path, exist_ok=True)
+            os.makedirs(target_dir, exist_ok=True)
         
         # Extract all .wav files from the zip
         for file in zip_ref.namelist():
             if file.endswith('.wav'):
-                zip_ref.extract(file, extract_path)
+                zip_ref.extract(file, target_dir)
     
     # Remove the downloaded zip file after extraction
     os.remove(zip_path)
