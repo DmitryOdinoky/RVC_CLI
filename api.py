@@ -19,7 +19,7 @@ def execute_command(command):
 # Helper function to download and extract files from Google Drive using gdown
 def download_and_extract_gdrive(gdrive_id, target_dir):
     url = f"https://drive.google.com/uc?id={gdrive_id}"
-    zip_path = os.path.join(target_dir, "temp.zip")
+    zip_path = os.path.join(target_dir, f"{gdrive_id}.zip")
     
     gdown.download(url, output=zip_path, quiet=False)
 
@@ -35,7 +35,7 @@ def download_and_extract_gdrive(gdrive_id, target_dir):
 # Combined function to download and extract .wav files from Google Drive using gdown
 def download_extract_dataset(gdrive_id, target_dir):
     url = f"https://drive.google.com/uc?id={gdrive_id}"
-    zip_path = target_dir
+    zip_path = os.path.join(target_dir, f"{gdrive_id}.zip")
     
     gdown.download(url, output=zip_path, quiet=False)
 
