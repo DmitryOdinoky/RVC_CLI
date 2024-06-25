@@ -150,7 +150,11 @@ async def tts(request: Request):
 
 @app.post("/preprocess")
 async def preprocess(request: Request):
-    command = ["python", "rvc.py", "preprocess"] + await request.json()
+    data = await request.json()
+    command = ["python", "rvc.py", "preprocess"]
+    for key, value in data.items():
+        command.append(f"--{key}")
+        command.append(str(value))
     return execute_command(command)
 
 @app.post("/extract")
