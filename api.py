@@ -19,7 +19,7 @@ def execute_command(command):
 # Helper function to download and extract files from Google Drive using gdown
 def download_and_extract_gdrive(gdrive_id, target_dir):
     url = f"https://drive.google.com/uc?id={gdrive_id}"
-    zip_path = target_dir
+    zip_path = os.path.join(target_dir, "temp.zip")
     
     gdown.download(url, output=zip_path, quiet=False)
 
@@ -35,7 +35,7 @@ def download_and_extract_gdrive(gdrive_id, target_dir):
 # Combined function to download and extract .wav files from Google Drive using gdown
 def download_extract_dataset(gdrive_id, target_dir):
     url = f"https://drive.google.com/uc?id={gdrive_id}"
-    zip_path = os.path.join(target_dir, "temp.zip")
+    zip_path = target_dir
     
     gdown.download(url, output=zip_path, quiet=False)
 
@@ -77,7 +77,8 @@ async def remove_dataset():
         raise HTTPException(status_code=404, detail="Dataset directory not found")
 
 # Endpoint to handle removing a specific subfolder within the dataset directory
-async def remove_subfolder(subfolder_name: str):
+@app.delete("/remove_dataset_subfolder")
+async def remove_dataset_subfolder(subfolder_name: str):
     target_dir = "/app/data/dataset"
     subfolder_path = os.path.join(target_dir, subfolder_name)
 
