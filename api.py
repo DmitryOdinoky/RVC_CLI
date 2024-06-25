@@ -32,17 +32,34 @@ def download_and_extract_gdrive(gdrive_id, target_dir):
     # Remove the downloaded zip file after extraction
     os.remove(zip_path)
 
+# Helper function to get the original filename from Google Drive
+def get_original_filename(gdrive_id):
+    url = f"https://drive.google.com/uc?id={gdrive_id}"
+    headers = {"Content-Type": "application/json"}
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        content_disposition = response.headers.get("content-disposition")
+        if content_disposition:
+            filename = re.findall("filename=(.+)", content_disposition)
+            if filename:
+                return filename[0].strip('"')
+    return None
+
 # Combined function to download and extract .wav files from Google Drive using gdown
 def download_extract_dataset(gdrive_id, target_dir):
+    original_filename = get_original_filename(gdrive_id)
+    if not original_filename:
+        raise ValueError("Failed to retrieve original filename from Google Drive.")
+
     url = f"https://drive.google.com/uc?id={gdrive_id}"
-    zip_path = os.path.join(target_dir, "temp.zip")
+    zip_path = os.path.join(target_dir, original_filename)
     
     gdown.download(url, output=zip_path, quiet=False)
 
     # Extract all .wav files from the downloaded zip
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         # Get the base filename of the zip file (without extension)
-        zip_filename_without_extension = os.path.splitext(os.path.basename(zip_path))[0]
+        zip_filename_without_extension = os.path.splitext(original_filename)[0]
 
         # Extract path should be a subfolder named after the zip file
         extract_path = os.path.join(target_dir, zip_filename_without_extension)
