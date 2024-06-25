@@ -60,7 +60,7 @@ def download_extract_dataset(gdrive_id, target_dir):
                 zip_ref.extract(file, target_dir)
     
     # Remove the downloaded zip file after extraction
-    os.remove(zip_path)
+    # os.remove(zip_path)
 
 # Endpoint to handle removing dataset directory
 @app.delete("/remove_dataset")
@@ -150,11 +150,7 @@ async def tts(request: Request):
 
 @app.post("/preprocess")
 async def preprocess(request: Request):
-    data = await request.json()
-    command = ["python", "rvc.py", "preprocess"]
-    for key, value in data.items():
-        command.append(f"--{key}")
-        command.append(str(value))
+    command = ["python", "rvc.py", "preprocess"] + await request.json()
     return execute_command(command)
 
 @app.post("/extract")
