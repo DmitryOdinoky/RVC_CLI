@@ -16,6 +16,17 @@ def execute_command(command):
     except Exception as e:
         return {"error": str(e)}
 
+def prepare_command(data, command):
+    try:
+        for key, value in data.items():
+            command.append(f"--{key}")
+            command.append(str(value))
+    except Exception as e:
+        return {"error": str(e)}
+
+    return command
+
+
 # Helper function to download and extract files from Google Drive using gdown
 def download_and_extract_gdrive(gdrive_id, target_dir):
     url = f"https://drive.google.com/uc?id={gdrive_id}"
@@ -152,9 +163,11 @@ async def tts(request: Request):
 async def preprocess(request: Request):
     data = await request.json()
     command = ["python", "rvc.py", "preprocess"]
-    for key, value in data.items():
-        command.append(f"--{key}")
-        command.append(str(value))
+    # for key, value in data.items():
+    #     command.append(f"--{key}")
+    #     command.append(str(value))
+    command = prepare_command(data, command)
+
     return execute_command(command)
 
 @app.post("/extract")
