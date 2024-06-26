@@ -146,58 +146,73 @@ async def download_gdrive_pths(request: Request):
 # Other endpoints...
 @app.post("/infer")
 async def infer(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "infer"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/batch_infer")
 async def batch_infer(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "batch_infer"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/tts")
 async def tts(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "tts"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/preprocess")
 async def preprocess(request: Request):
     data = await request.json()
     command = ["python", "rvc.py", "preprocess"]
-    # for key, value in data.items():
-    #     command.append(f"--{key}")
-    #     command.append(str(value))
     command = prepare_command(data, command)
 
     return execute_command(command)
 
 @app.post("/extract")
 async def extract(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "extract"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/train")
 async def train(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "train"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/index")
 async def index(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "index"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/model_information")
 async def model_information(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "model_information"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/model_fusion")
 async def model_fusion(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "model_fusion"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.post("/download")
 async def download(request: Request):
+    data = await request.json()
     command = ["python", "rvc.py", "download"] + await request.json()
+    command = prepare_command(data, command)
     return execute_command(command)
 
 @app.get("/ping")
