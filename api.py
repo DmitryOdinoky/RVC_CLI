@@ -71,7 +71,7 @@ def download_extract_dataset(gdrive_id, target_dir):
                 zip_ref.extract(file, target_dir)
     
     # Remove the downloaded zip file after extraction
-    os.remove(zip_path)
+    # os.remove(zip_path)
 
 # Endpoint to handle removing dataset directory
 @app.delete("/remove_dataset")
